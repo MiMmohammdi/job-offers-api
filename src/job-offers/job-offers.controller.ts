@@ -74,7 +74,7 @@ export class JobOffersController {
     @Query('page_size') page_size: number = 10,
     @Query('title') title: string = '',
     @Query('location') location: string = '',
-    @Query('salary Rane') salary: string = '',
+    @Query('salary') salary: string = '',
     @Query('company') company: string = '',
   ) {
     const filter = {
