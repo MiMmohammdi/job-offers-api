@@ -152,14 +152,30 @@ export class JobOffersService {
   private async storeJobOffers() {
     try {
       for (const job of this.jobsData) {
+        if (!job.jobId || job.jobId === 'unknown') {
+          this.logger.warn(
+            `Skipping job with invalid jobId: ${JSON.stringify(job)}`,
+          );
+          continue;
+        }
         const exists = await this.jobOfferRepository.findOne({
-          where: { jobId: job.jobId, title: job.title },
+          where: { jobId: job.jobId },
         });
         if (!exists) {
-          await this.jobOfferRepository.save(job);
+          try {
+            await this.jobOfferRepository.save(job);
+            this.logger.log('Job offers stored successfully');
+          } catch (error) {
+            this.logger.error(
+              `Failed to save job with jobId ${job.jobId}: ${error.message}`,
+            );
+          }
+        } else {
+          this.logger.log(
+            `Job with jobId ${job.jobId} already exists, skipping.`,
+          );
         }
       }
-      this.logger.log('Job offers stored successfully');
     } catch (error) {
       this.logger.error('Can not store jobs in database', error);
     }
