@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity()
-@Unique(['title', 'company', 'jobId'])
+@Unique(['jobId'])
 export class JobOffer {
   @PrimaryGeneratedColumn('uuid')
   id: string;
