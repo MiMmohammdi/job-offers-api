@@ -3,8 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JobOffer } from './entities/job-offer.entity';
 import axios from 'axios';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { SchedulerRegistry } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
+import { CronJob } from 'cron';
 
 interface GetJobOffersQuery {
   page: number;
@@ -15,7 +16,6 @@ interface GetJobOffersQuery {
 @Injectable()
 export class JobOffersService {
   private readonly logger = new Logger(JobOffersService.name);
-  private readonly configService: ConfigService;
   private jobsData: Array<any> = [];
 
   private currencyMap: { [key: string]: string } = {
@@ -38,9 +38,38 @@ export class JobOffersService {
   constructor(
     @InjectRepository(JobOffer)
     private readonly jobOfferRepository: Repository<JobOffer>,
-  ) {}
+    private readonly configService: ConfigService,
+    private readonly schedulerRegistry: SchedulerRegistry,
+  ) {
+    this.setupCronJob();
+  }
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  /**
+   * Sets up a cron job to periodically fetch and store job offers.
+   *
+   * The cron schedule expression is retrieved from the configuration service
+   * using the 'CRON_SCHEDULE' key, defaulting to '0 * * * * *' if not set.
+   * The job is registered with the scheduler registry under the name
+   * 'fetchAndStoreJobOffers' and started immediately.
+   * Logs the configured cron expression for reference.
+   *
+   * @private
+   */
+  private setupCronJob() {
+    const cronExpression = this.configService.get<string>(
+      'CRON_SCHEDULE',
+      '0 * * * * *',
+    );
+    const job = new CronJob(cronExpression, () => {
+      this.fetchAndStoreJobOffers();
+    });
+
+    this.schedulerRegistry.addCronJob('fetchAndStoreJobOffers', job);
+    job.start();
+
+    this.logger.log(`Cron job scheduled with expression: ${cronExpression}`);
+  }
+
   /**
    * Fetches job offers from two external APIs, parses the retrieved data,
    * and stores the job offers in the database.

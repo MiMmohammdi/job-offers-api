@@ -120,13 +120,17 @@ npm run test:cov
 ## 🔒 Environment Variables
 
 | Variable        | Description                     | Default   |
-|-----------------|--------------------------------|-----------|
-| `PORT`          | Application port               | 3000      |
-| `DB_HOST`       | Database host                  | localhost |
-| `DB_PORT`       | Database port                  | 5432      |
-| `DB_USERNAME`   | Database username              | postgres  |
-| `DB_PASSWORD`   | Database password              | -         |
-| `DB_NAME`       | Database name                  | job_offers|
+|--------------------------|--------------------------------|------------|
+| `PORT`                   | Application port               | 3000       |
+| `DB_HOST`                | Database host                  | localhost  |
+| `DB_PORT`                | Database port                  | 5432       |
+| `DB_USERNAME`            | Database username              | postgres   |
+| `DB_PASSWORD`            | Database password              | -          |
+| `DB_NAME`                | Database name                  | job_offers |
+| `CRON_SCHEDULE`          | Cron job schedule              | 0 * * * * *|
+| `RATE_LIMIT_TTL`         | Rate limit ttl                 | 6000       |
+| `RATE_LIMIT_MAX_REQUEST` | Rate limit req                 | 1000       |
+
 
 
 ## 🛡 Security
@@ -134,9 +138,5 @@ npm run test:cov
 - Always keep dependencies updated
 - Use environment variable management
 - Implement proper authentication for production
-
-## 📞 Support
-
-For issues or questions, please open a GitHub issue.
 
 ---
