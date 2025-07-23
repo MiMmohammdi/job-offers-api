@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { JobOffersService } from './job-offers.service';
 import { JobOffer } from './entities/job-offer.entity';
 import axios from 'axios';
+import { ConfigService } from '@nestjs/config';
+import { SchedulerRegistry } from '@nestjs/schedule';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -12,6 +14,17 @@ describe('JobOffersService', () => {
   let service: JobOffersService;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let jobOfferRepository: Repository<JobOffer>;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let schedulerRegistry: SchedulerRegistry;
+
+  const mockConfigService = {
+    get: jest.fn().mockReturnValue('0 * * * *'),
+  };
+
+  const mockSchedulerRegistry = {
+    addCronJob: jest.fn(),
+    getCronJobs: jest.fn().mockReturnValue(new Map()),
+  };
 
   const mockJobOfferRepository = {
     findOne: jest.fn(),
@@ -33,11 +46,20 @@ describe('JobOffersService', () => {
           provide: getRepositoryToken(JobOffer),
           useValue: mockJobOfferRepository,
         },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
+        {
+          provide: SchedulerRegistry,
+          useValue: mockSchedulerRegistry,
+        },
       ],
     }).compile();
 
     service = module.get<JobOffersService>(JobOffersService);
     jobOfferRepository = module.get(getRepositoryToken(JobOffer));
+    schedulerRegistry = module.get<SchedulerRegistry>(SchedulerRegistry);
   });
 
   afterEach(() => {
