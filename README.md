@@ -119,7 +119,7 @@ npm run test:cov
 
 ## 🔒 Environment Variables
 
-| Variable        | Description                     | Default   |
+| Variable                 | Description                    | Default   |
 |--------------------------|--------------------------------|------------|
 | `PORT`                   | Application port               | 3000       |
 | `DB_HOST`                | Database host                  | localhost  |
